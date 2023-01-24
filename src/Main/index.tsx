@@ -8,8 +8,10 @@ import { Button } from '../components/Button';
 import { Cart } from '../components/Cart';
 import { Categories } from '../components/Categories';
 import { Header } from '../components/Header';
+import { Empty } from '../components/Icons/Empty';
 import { Menu } from '../components/Menu';
 import { TableModal } from '../components/TableModal';
+import { Text } from '../components/Text';
 import {
   Container,
   CategoriesContainer,
@@ -20,10 +22,11 @@ import {
 } from './styles';
 
 export function Main() {
-  const [isLoading] = useState(true);
+  const [isLoading] = useState(false);
   const [isTableModalVisible, setIsTableModalVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [products] = useState<Product[]>([]);
 
   function handleNewOrderPress() {
     setIsTableModalVisible(true);
@@ -114,9 +117,21 @@ export function Main() {
               <Categories />
             </CategoriesContainer>
 
-            <MenuContainer>
-              <Menu onAddItem={handleAddToCart} />
-            </MenuContainer>
+            {products.length > 0 ? (
+              <MenuContainer>
+                <Menu
+                  onAddItem={handleAddToCart}
+                  products={products}
+                />
+              </MenuContainer>
+            ) : (
+              <CenteredContainer>
+                <Empty />
+                <Text color="#666" style={{ marginTop: 24 }}>
+                  Nenhum produto foi encontrado!
+                </Text>
+              </CenteredContainer>
+            )}
           </>
         )}
       </Container>

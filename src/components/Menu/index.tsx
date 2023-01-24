@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { API_URL } from '@env';
 import { Product } from '../../@types/Product';
 
-import { products } from '../../mocks/products';
 import R$ from '../../utils/formatCurrency';
 
 import { Text } from '../Text';
@@ -19,10 +18,11 @@ import { PlusCircle } from '../Icons/PlusCircle';
 import { ProductModal } from '../ProductModal';
 
 interface MenuProps {
+  products: Product[];
   onAddItem: (product: Product) => void;
 }
 
-export function Menu({ onAddItem }: MenuProps) {
+export function Menu({ products, onAddItem }: MenuProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
