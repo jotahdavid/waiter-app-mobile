@@ -21,20 +21,39 @@ import {
   Summary,
   TotalContainer,
 } from './styles';
+import { OrderConfirmedModal } from '../OrderConfirmedModal';
+import { useState } from 'react';
 
 interface CartProps {
   items: CartItem[];
   onAdd: (product: Product) => void;
   onDecrement: (product: Product) => void;
+  onConfirmOrder: () => void;
 }
 
-export function Cart({ items, onAdd, onDecrement }: CartProps) {
+export function Cart({ items, onAdd, onDecrement, onConfirmOrder }: CartProps) {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const totalPrice = items.reduce((acc, cartItem) => (
     acc + cartItem.quantity * cartItem.product.price
   ), 0);
 
+  function handleFinishOrder() {
+    setIsModalVisible(true);
+  }
+
+  function handleConfirmOrder() {
+    onConfirmOrder();
+    setIsModalVisible(false);
+  }
+
   return (
     <>
+      <OrderConfirmedModal
+        visible={isModalVisible}
+        onConfirm={handleConfirmOrder}
+      />
+
       {items.length > 0 && (
         <FlatList
           data={items}
@@ -95,7 +114,7 @@ export function Cart({ items, onAdd, onDecrement }: CartProps) {
           )}
         </TotalContainer>
         <Button
-          onPress={() => null}
+          onPress={handleFinishOrder}
           disabled={items.length <= 0}
         >
           Confirmar pedido
