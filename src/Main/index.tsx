@@ -1,5 +1,9 @@
 import { useState } from 'react';
+
+import { CartItem } from '../@types/CartItem';
+
 import { Button } from '../components/Button';
+import { Cart } from '../components/Cart';
 import { Categories } from '../components/Categories';
 import { Header } from '../components/Header';
 import { Menu } from '../components/Menu';
@@ -15,6 +19,7 @@ import {
 export function Main() {
   const [isTableModalVisible, setIsTableModalVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
 
   function handleNewOrderPress() {
@@ -56,6 +61,10 @@ export function Main() {
             <Button onPress={handleNewOrderPress}>
               Novo Pedido
             </Button>
+          )}
+
+          {selectedTable && (
+            <Cart items={cartItems} />
           )}
         </FooterContainer>
       </Footer>

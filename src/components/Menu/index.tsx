@@ -42,7 +42,7 @@ export function Menu() {
       <FlatList
         data={products}
         style={{ marginTop: 32 }}
-        contentContainerStyle={{ paddingHorizontal: 24 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16 }}
         keyExtractor={(product) => product._id}
         ItemSeparatorComponent={Separator}
         renderItem={({ item: product }) => (
