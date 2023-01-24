@@ -2,12 +2,14 @@ import { FlatList } from 'react-native';
 
 import { API_URL } from '@env';
 import { CartItem } from '../../@types/CartItem';
+import { Product } from '../../@types/Product';
 import R$ from '../../utils/formatCurrency';
 
 import { MinusCircle } from '../Icons/MinusCircle';
 import { PlusCircle } from '../Icons/PlusCircle';
 
 import { Text } from '../Text';
+import { Button } from '../Button';
 import {
   Item,
   ProductContainer,
@@ -19,13 +21,18 @@ import {
   Summary,
   TotalContainer,
 } from './styles';
-import { Button } from '../Button';
 
 interface CartProps {
   items: CartItem[];
+  onAdd: (product: Product) => void;
+  onDecrement: (product: Product) => void;
 }
 
-export function Cart({ items }: CartProps) {
+export function Cart({ items, onAdd, onDecrement }: CartProps) {
+  const totalPrice = items.reduce((acc, cartItem) => (
+    acc + cartItem.quantity * cartItem.product.price
+  ), 0);
+
   return (
     <>
       {items.length > 0 && (
@@ -58,11 +65,14 @@ export function Cart({ items }: CartProps) {
               </ProductContainer>
 
               <Actions>
-                <Action style={{ marginRight: 16 }}>
+                <Action
+                  style={{ marginRight: 16 }}
+                  onPress={() => onAdd(cartItem.product)}
+                >
                   <PlusCircle />
                 </Action>
 
-                <Action>
+                <Action onPress={() => onDecrement(cartItem.product)}>
                   <MinusCircle />
                 </Action>
               </Actions>
@@ -76,7 +86,7 @@ export function Cart({ items }: CartProps) {
           {items.length > 0 ? (
             <>
               <Text color="#666">Total</Text>
-              <Text size={20} weight="600">{R$(120)}</Text>
+              <Text size={20} weight="600">{R$(totalPrice)}</Text>
             </>
           ) : (
             <Text color="#999" style={{ marginRight: 32 }}>

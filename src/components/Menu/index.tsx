@@ -18,7 +18,11 @@ import {
 import { PlusCircle } from '../Icons/PlusCircle';
 import { ProductModal } from '../ProductModal';
 
-export function Menu() {
+interface MenuProps {
+  onAddItem: (product: Product) => void;
+}
+
+export function Menu({ onAddItem }: MenuProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -37,6 +41,7 @@ export function Menu() {
         visible={isModalVisible}
         onClose={handleCloseModal}
         product={selectedProduct}
+        onAddItem={onAddItem}
       />
 
       <FlatList
@@ -65,7 +70,7 @@ export function Menu() {
               </Text>
             </ProductDetails>
 
-            <AddToCartButton>
+            <AddToCartButton onPress={() => onAddItem(product)}>
               <PlusCircle />
             </AddToCartButton>
           </ProductContainer>

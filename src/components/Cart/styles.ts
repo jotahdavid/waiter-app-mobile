@@ -20,6 +20,7 @@ export const Image = styled.Image`
 export const QuantityContainer = styled.View`
   min-width: 20px;
   margin-left: 12px;
+  margin-right: 4px;
 `;
 
 export const ProductDetails = styled.View`
