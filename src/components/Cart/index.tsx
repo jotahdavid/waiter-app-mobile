@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { FlatList } from 'react-native';
 
 import { API_URL } from '@env';
 import { CartItem } from '../../@types/CartItem';
 import { Product } from '../../@types/Product';
 import R$ from '../../utils/formatCurrency';
+import { api } from '../../utils/api';
 
 import { MinusCircle } from '../Icons/MinusCircle';
 import { PlusCircle } from '../Icons/PlusCircle';
@@ -22,24 +24,37 @@ import {
   TotalContainer,
 } from './styles';
 import { OrderConfirmedModal } from '../OrderConfirmedModal';
-import { useState } from 'react';
 
 interface CartProps {
   items: CartItem[];
+  selectedTable: string;
   onAdd: (product: Product) => void;
   onDecrement: (product: Product) => void;
   onConfirmOrder: () => void;
 }
 
-export function Cart({ items, onAdd, onDecrement, onConfirmOrder }: CartProps) {
-  const [isLoading] = useState(false);
+export function Cart({ items, selectedTable, onAdd, onDecrement, onConfirmOrder }: CartProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const totalPrice = items.reduce((acc, cartItem) => (
     acc + cartItem.quantity * cartItem.product.price
   ), 0);
 
-  function handleFinishOrder() {
+  async function handleFinishOrder() {
+    setIsLoading(true);
+
+    const payload = {
+      table: selectedTable,
+      products: items.map((cartItem) => ({
+        product: cartItem.product._id,
+        quantity: cartItem.quantity,
+      })),
+    };
+
+    await api.post('/orders', payload);
+
+    setIsLoading(false);
     setIsModalVisible(true);
   }
 
