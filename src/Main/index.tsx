@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
+import { API_URL } from '@env';
 import { CartItem } from '../@types/CartItem';
 import { Product } from '../@types/Product';
+import { Category } from '../@types/Category';
+import { api } from '../utils/api';
 
 import { Button } from '../components/Button';
 import { Cart } from '../components/Cart';
@@ -22,11 +25,43 @@ import {
 } from './styles';
 
 export function Main() {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [isTableModalVisible, setIsTableModalVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [products] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const [categoriesResponse, productsResponse] = await Promise.all([
+        api.get('/categories'),
+        api.get('/products'),
+      ]);
+
+      setCategories(categoriesResponse.data);
+      setProducts(productsResponse.data);
+
+      setIsLoading(false);
+    })();
+  }, []);
+
+  async function handleSelectCategory(categoryId: string | null) {
+    if (isLoadingProducts) {
+      return false;
+    }
+
+    setIsLoadingProducts(true);
+
+    const route = categoryId ? `/categories/${categoryId}/products` : '/products';
+    const response = await api.get(route);
+
+    setProducts(response.data);
+    setIsLoadingProducts(false);
+
+    return true;
+  }
 
   function handleNewOrderPress() {
     setIsTableModalVisible(true);
@@ -105,18 +140,23 @@ export function Main() {
           onCancelOrder={handleResetOrder}
         />
 
-        {isLoading && (
+        {!isLoading && (
+          <CategoriesContainer>
+            <Categories
+              categories={categories}
+              onSelectCategory={handleSelectCategory}
+            />
+          </CategoriesContainer>
+        )}
+
+        {(isLoading || isLoadingProducts) && (
           <CenteredContainer>
             <ActivityIndicator color="#d73035" size="large" />
           </CenteredContainer>
         )}
 
-        {!isLoading && (
+        {!isLoadingProducts && (
           <>
-            <CategoriesContainer>
-              <Categories />
-            </CategoriesContainer>
-
             {products.length > 0 ? (
               <MenuContainer>
                 <Menu
@@ -128,7 +168,7 @@ export function Main() {
               <CenteredContainer>
                 <Empty />
                 <Text color="#666" style={{ marginTop: 24 }}>
-                  Nenhum produto foi encontrado!
+              Nenhum produto foi encontrado!
                 </Text>
               </CenteredContainer>
             )}
